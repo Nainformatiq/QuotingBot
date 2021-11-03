@@ -1,0 +1,30 @@
+{
+  "name": "quotingbot",
+  "version": "1.0.0",
+  "description": "Twitch bot for quoting sentences !",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nainformatiq/QuotingBot.git"
+  },
+  "keywords": [
+    "twitch",
+    "bot",
+    "quote"
+  ],
+  "author": "Nainformatiq",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nainformatiq/QuotingBot/issues"
+  },
+  "homepage": "https://github.com/Nainformatiq/QuotingBot#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "fs": "^0.0.1-security",
+    "node-fetch": "^3.0.0",
+    "tmi.js": "^1.8.5"
+  }
+}
