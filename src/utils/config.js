@@ -4,6 +4,7 @@ module.exports = {
         username: '',
 
         token:  '',
+        secret: '',
         clientId:  '',
     },
 
