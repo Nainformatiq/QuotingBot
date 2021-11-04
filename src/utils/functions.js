@@ -1,4 +1,4 @@
-const config = require('./config')
+const config = require('../../config')
 
 module.exports.getQuote = getQuote;
 module.exports.getSentence = getSentence;

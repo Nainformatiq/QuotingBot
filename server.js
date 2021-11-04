@@ -5,7 +5,7 @@
 const { Client } = require('tmi.js'); // Module for communicate with twitch API.
 const fs = require('fs'); // Module pour intérragir avec le systèmes de fichier.
 
-const conf = require('./src/utils/config'); // Import du fichier de configuratiion.
+const conf = require('./config'); // Import du fichier de configuratiion.
 const { getSentence, replacedefaultmessages } = require('./src/utils/functions');
 
 ////////////////////////////////
