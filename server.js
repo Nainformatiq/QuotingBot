@@ -12,7 +12,7 @@ const { getSentence, replacedefaultmessages } = require('./src/utils/functions')
 // INITIALLISATION DU CLIENT //
 //////////////////////////////
 
-/**const client = new Client({
+const client = new Client({
 
     options: {
         debug: true,
@@ -34,14 +34,39 @@ const { getSentence, replacedefaultmessages } = require('./src/utils/functions')
     channels: conf.channels,
 });
 
-module.exports = client;*/
+module.exports = client;
+
+//bot connexion
+
+client.connect().then(() => {
+    console.log('Je suis connecté à twitch ! \n')
+
+}, () => {
+    console.log('Aie il y a eu une erreur de connexion ...')
+});
+
+client.on('connected', (addr, port) => {
+    console.log(`Bot connecté à : ${addr}:${port} \n`);
+});
+
+
+client.on('join', (channel, username, self) => {
+    
+    console.log(`Je suis connecté sur la chaîne de : ${channel} \n`);
+
+    client.say(channel, 'Bot en ligne !')
+    client.say(channel, '/w tiotbenjy Le QuoteBot est lancé !');
+
+    console.log()
+});
+
 
 ///////////////////////////////
 //// CMDS & EVENT HANDLER ////
 /////////////////////////////
 
-/**client.events == new Set();
+client.events == new Set();
 client.categories = fs.readdirSync("./src/commands/");
 
 
-require(`./src/utils/eventHandler.js`)(client)*/
+require(`./src/utils/eventHandler.js`)(client)
