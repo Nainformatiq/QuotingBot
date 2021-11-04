@@ -7,5 +7,11 @@ module.exports = {
         clientId:  '',
     },
 
-    channels: [""]
+    channels: [""],
+
+    sentences: [
+        "%%",
+        "%%",
+        "%%",
+    ],
 }

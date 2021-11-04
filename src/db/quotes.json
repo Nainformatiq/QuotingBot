@@ -1,0 +1,10 @@
+{
+    "userid":[
+        {
+            "userMadeQuote": "userid",
+            "userQuoted": "userid",
+            "date": "date",
+            "quote": "text"
+        }
+    ]
+}
