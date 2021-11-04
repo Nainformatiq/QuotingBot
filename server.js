@@ -8,6 +8,7 @@ const fs = require('fs'); // Module pour intérragir avec le systèmes de fichie
 const conf = require('./config'); // Import du fichier de configuratiion.
 const { getSentence, replacedefaultmessages } = require('./src/utils/functions');
 
+const db = require('./src/db/quotes.json')
 ////////////////////////////////
 // INITIALLISATION DU CLIENT //
 //////////////////////////////
@@ -31,7 +32,7 @@ const client = new Client({
         password: 'oauth:' + conf.bot.token
     },
 
-    channels: conf.channels,
+    channels: ['tiotbenjy'] //conf.channels,
 });
 
 module.exports = client;
@@ -52,12 +53,13 @@ client.on('connected', (addr, port) => {
 
 client.on('join', (channel, username, self) => {
     
-    console.log(`Je suis connecté sur la chaîne de : ${channel} \n`);
+    if (self) {
+        console.log(`Je suis connecté sur la chaîne de : ${channel} \n`);
+        //client.say(channel, 'Bot en ligne !')
+        //client.say(channel, '/w tiotbenjy Le QuoteBot est lancé !');
+    }
 
-    client.say(channel, 'Bot en ligne !')
-    client.say(channel, '/w tiotbenjy Le QuoteBot est lancé !');
-
-    console.log()
+    
 });
 
 

@@ -2,10 +2,16 @@ module.exports = {
 
     bot: {
         username: '',
-
+        prefix: '!',
+        
         token:  '',
         secret: '',
         clientId:  '',
+    },
+
+    permissions: {
+        validPerms: ['broadcaster', 'moderator', 'subscriber', 'vip', 'turbo', 'bits'],
+        exempt: ['broadcaster'],
     },
 
     channels: ["chezgamain"],

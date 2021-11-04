@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/Nainformatiq/QuotingBot#readme",
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "axios": "^0.24.0",
     "chalk": "^4.1.2",
     "fs": "^0.0.1-security",
     "node-fetch": "^3.0.0",
