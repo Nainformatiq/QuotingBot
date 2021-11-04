@@ -5,8 +5,8 @@ module.exports = {
     aliases: ['q'], 
     permissions: [], 
     cooldown: 5,
-    run: async(client, channel, userstate, context) => { 
+    run: async(client, channel, userstate, message, self, context) => { 
 
-        addQuote(client, channel, userstate, self, context)
+        addQuote(client, channel, userstate, message, self, context)
     }
 }

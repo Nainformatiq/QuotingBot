@@ -1,72 +1,155 @@
-const config = require('../../config')
-const db = require('../db/quotes.json')
+const axios = require('axios');
+const fs = require('fs')
+
+const config = require('../../config');
+const db = require('../db/quotes.json');
 
 module.exports.getQuote = getQuote;
 module.exports.getSentence = getSentence;
-module.exports.replacedefaultmessages = replacedefaultmessages;
 module.exports.addQuote = addQuote;
 
+const twitchHeader = {
+    headers: {
+    "Client-ID": config.bot.clientId,
+    Authorization: `Bearer ${config.bot.token}`
+    },
+};
 
-async function addQuote(client, channel, userstate, self, context){
+const sentences = [
+    `On me dit à l'oreille qu'un jour %{userQuoted}% à dit : "%{quote}%". Merci à %{userQuote}%. `,
+    `Le %{time}% %{userQuoted}% à dit : "%{quote}%". Merci à %{userQuote}%. `,  
+    `Le %{time}% %{userQuoted}% à dit : "%{quote}%". Merci à %{userQuote}%. `,  
+    `Le %{time}% %{userQuoted}% à dit : "%{quote}%". Merci à %{userQuote}%. `,  
+];
+
+
+async function addQuote(client, channel, userstate, message, self, context) {
     
     const chan = channel.substr(1)
-    console.log(db[chan][0])
 
-    const mentionnedUser = context[0].toLowerCase();
+    if(context.length === 0){
+        client.say(channel, '/me Utilisation de la commande : !quote @viewer "message". Exemple : !quote @tiotbenjy "Bonjour le tchat !"')
+    }else {
+        const mentionnedUser = context[0].toLowerCase(); 
 
-    var mentionnedUserId = "";
+        if(!mentionnedUser.startsWith('@')){
+            return client.say(channel, `@${userstate.username} Vous devez utiliser la commande comme ceci !quote @viewer "message". Exemple !quote @tiotbenjy "Bonjour le tchat"`)
+        }else {
 
-    const twitchHeader = {
-        headers: {
-          "Client-ID": config.twitch.clientId,
-          Authorization: `Bearer ${config.twitch.password}`
-        },
-    };
+            var mentionnedUserId = "";
 
-    const urlUserID = `https://api.twitch.tv/helix/users?login=${mentionnedUser}`;
-    
-    try {
-        const response = await axios.get(urlUserID, twitchHeader).catch((err) => console.log(err));
-        const res = await response.data;
+            const urlUserID = `https://api.twitch.tv/helix/users?login=${mentionnedUser.substr(1)}`;
+            
+            try {
+                const response = await axios.get(urlUserID, twitchHeader).catch((err) => console.log(err));
+                const res = await response.data;
 
-        const broadcasterID = res.data[0].id;
+                mentionnedUserId = res.data[0].id;
 
-        const urlSubs = `https://api.twitch.tv/helix/users/follows?to_id=${broadcasterID}`;
+            } catch (e) {
+                console.log(e);
+            }
 
-        const response2 = await axios.get(urlSubs, twitchHeader).catch((err) => console.log(err));
-        const res2 = await response2.data;
+            const msg = context.splice(1).join(' ');
 
-        client.say(channel, `Rainbow à actuellement ${res2.total} followers raiiin4Love Merci à vous pour votre soutien !`);
+            if(!msg.startsWith(`"`)){
 
+                if(!db[chan]) db[chan] = [];
 
-    } catch (e) {
-        console.log(e);
-    }
+                db[chan].unshift({
+                    date: getDate(),
+                    userMadeQuote: userstate['user-id'],
+                    userQuoted: mentionnedUserId,
+                    quote: msg,
+                });
 
-    const quote = context.splice(1).join(' ');
+                fs.writeFileSync('./src/db/quotes.json', JSON.stringify(db, null, 2))
+
+                client.say(channel, `/me @${userstate.username} Merci ! Ta citation à bien été entrgisté pour la chaine twitch de @${chan}`);
+                
+            }else{
+
+                if(msg.startsWith(`"`)){
+                    var find = `"`;
+                    var re = new RegExp(find, 'g');
+
+                    var newmsg = msg.replace(re, '');
+
+                    if(!db[chan]) db[chan] = [];
+
+                    db[chan].unshift({
+                        date: getDate(),
+                        userMadeQuote: userstate['user-id'],
+                        userQuoted: mentionnedUserId,
+                        quote: newmsg,
+                    });
+
+                    fs.writeFileSync('./src/db/quotes.json', JSON.stringify(db, null, 2));
+
+                    client.say(channel, `/me @${userstate.username} Merci ! Ta citation à bien été entrgisté pour la chaine twitch de @${chan}`);
+
+                }else if(msg.startsWith(`'`)) {
+                    var find = `'`;
+                    var re = new RegExp(find, 'g');
+
+                    var newmsg = msg.replace(re, '');
+
+                    if(!db[chan]) db[chan] = [];
+
+                    db[chan].unshift({
+                        date: getDate(),
+                        userMadeQuote: userstate['user-id'],
+                        userQuoted: mentionnedUserId,
+                        quote: newmsg,
+                    });
+
+                    fs.writeFileSync('./src/db/quotes.json', JSON.stringify(db, null, 2));
+
+                    client.say(channel, `/me @${userstate.username} Merci ! Ta citation à bien été entrgisté pour la chaine twitch de @${chan}`);
+
+                }else{
+                    return;
+                }
+
+            }
+        }
+
+    };   
 
 }
 
-async function getSentence(){
+function getSentence(nbre){
 
-    const sentences = config.sentences;
+    const sentence = sentences[nbre];
+
+    return sentence;
+
+};
+
+async function getQuote(channel){
+
+    const chan = channel.substr(1)
+    //console.log(db[chan][0])
 
     var n = (sentences.length - 1);
 
-    const number = getRandomNumber(0, n);
+    const nbre = getRandomNumber(0, n);
 
-    const finalSentence = sentences[number];
+    const txt = getSentence(nbre);
 
-    return finalSentence;
+    console.log(txt)
 
-}
+    const quote = await replaceText(chan, nbre, txt)
 
-async function getQuote(){
+    console.log(quote)
 
-}
+    return quote;
+};
 
 function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+    const nbre = Math.floor(Math.random() * (max - min + 1) + min);
+
+    return nbre;
 };
 
 function getDate() {
@@ -81,17 +164,42 @@ function getDate() {
     return date;
 };
 
-function replacedefaultmessages(channel, userstate, context, text){
+async function replaceText(channel, number, text){
 
-    if(!text || text == undefined || text == null) throw "Aucun texte pour le message replacedefault ajouté comme premier paramètre";
+    //console.log(channel, number)
+
+    if(!text || text == undefined || text == null) return 'erreur';
     
+    //console.log(db[channel][number].date)
+
+    //if(text.includes())
+
+    const umq = await getUsername(db[channel][number].userMadeQuote);
+    const uq = await getUsername(db[channel][number].userQuoted);
+
     return String(text)
-      .replace(/%{time}%/gi, '1' )
-      .replace(/%{quote}%/gi, '2')
-      .replace(/%{user}%/gi, "3")
-      
+        .replace(/%{time}%/gi, db[channel][number].date)
+        .replace(/%{userQuote}%/gi, `@${umq}`)
+        .replace(/%{userQuoted}%/gi, `@${uq}`)
+        .replace(/%{quote}%/gi, db[channel][number].quote)
+        
 };
 
-function getUsername(){
+async function getUsername(userId){
+
+    var username;
+
+    const urlUserID = `https://api.twitch.tv/helix/users?id=${userId}`;
+            
+
+    await axios.get(urlUserID, twitchHeader)
+    .then((res) => {
+        username = res.data.data[0].login;
+
+        console.log(username)
+    })
+    .catch((err) => console.log(err)); 
+
+    return username;
 
 }

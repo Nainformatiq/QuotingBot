@@ -20,8 +20,6 @@ client.on('chat', async(channel, userstate, message, self) => {
     const commandName = context.shift().toLowerCase();
     const command = commands.getCommand(commandName);
 
-    //console.log(context[0].toLowerCase())
-
     const user = {
         username: userstate.username,
         displayName: userstate["display-name"],
@@ -37,16 +35,21 @@ client.on('chat', async(channel, userstate, message, self) => {
         if(isUserPermitted(userstate['badges'], command.permissions)){
 
             if(cooldown.has(user.userId, commandName)){
-                client.say(channel, `@${user.username} Il y a un cooldown de ${command.cooldown}s sur cette commande attendez un peut !`)
+                client.say(channel, `@${user.username} Il y a un cooldown de ${command.cooldown}s sur cette commande attends un peut !`)
             }else {
                 await command.run(client, channel, userstate, message, self, context);
             }
 
             if(Boolean(command.cooldown) === true){
-                cooldown.add(user.userId, commandName);
-                setTimeout(() => {
-                    cooldown.delete(user.userId, commandName);
-                }, (command.cooldown * 1000));
+                
+                if(userstate['badges'].broadcaster === '1' || userstate['badges'].moderator === '1'){
+                    return;
+                }else{
+                    cooldown.add(user.userId, commandName);
+                    setTimeout(() => {
+                        cooldown.delete(user.userId, commandName);
+                    }, (command.cooldown * 1000));
+                };
 
             }else{
                 return
